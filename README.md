@@ -10,6 +10,13 @@ Tested on Mac OSX Yosemite and Linux Ubuntu 14.04
 
 1. Pre-installed Python distribution (Ureka - which contains PyRAF - is good: http://ssb.stsci.edu/ureka/)
 2. The Python library lmfit (https://pypi.python.org/pypi/lmfit OR if pip is available, then in the terminal $> pip install lmfit)
+
+##############
+#IMPORTANT: It appears newer versions of lmfit are not compatible. Installing lmfit version 0.8.3 fixes this issue:
+
+  $> pip install lmfit==0.8.3
+###############
+
 3. A LaTeX distribution, necessary for generating the figures (the special fonts are required). Note, the code fits and generates logfile with results without this, but does not make the plots.
 
 #RECOMMENDED INSTALLATION
