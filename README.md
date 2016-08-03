@@ -36,6 +36,7 @@ For details on the use of the code to decompose galaxy profiles, please refer to
 #N.B. 
 
 It is recommended to start fitting without the PSF convolution (i.e., set its FWHM to 0). This is done very quickly and the result can be used to update the guesstimate parameter values. Then the fit can be run WITH the PSF convolution to get the exact solution.
+#ACKNOWLEDGEMENT
 
 If Profiler was useful for your research, please provide an acknowledgement by citing the above paper.
 
