@@ -259,7 +259,7 @@ def fitcomm():
 	x_original = x_original[xmino:xmaxo]
 	data_original = data_original[xmino:xmaxo]
 	
-	if ((x[2]-x[1]) != (x[1]-x[0]) and (x[2]-x[1]) != (x[3]-x[2]) and (x[3]-x[2]) != (x[4]-x[3])):
+	if ((x[2]-x[1]) != (x[1]-x[0]) and (x[2]-x[1]) != (x[3]-x[2])):
 		print 'The radial sampling step is not linear (uniform). Interpolating...'
 		f = interp1d(x,data,kind='slinear')
 		xn = linspace(0.,max(x),(max(x)-min(x))/((x[2]-x[1])))		
