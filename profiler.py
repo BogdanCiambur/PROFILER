@@ -259,6 +259,7 @@ def fitcomm():
 	x_original = x_original[xmino:xmaxo]
 	data_original = data_original[xmino:xmaxo]
 	
+	#print (x[4]-x[3]), (x[3]-x[2]), (x[2]-x[1]), (x[1]-x[0])
 	if ((x[2]-x[1]) != (x[1]-x[0]) and (x[2]-x[1]) != (x[3]-x[2])):
 		print 'The radial sampling step is not linear (uniform). Interpolating...'
 		f = interp1d(x,data,kind='slinear')
@@ -267,6 +268,8 @@ def fitcomm():
 		x = array(xn)
 		data = array(yn)
 		sampling = 'nonlinear'
+		
+	print 'The sampling of the data is :', sampling
  
 	xmin = datamin(xmin,x)
 	if (xmin != 0.): print 'WARNING: Data does not start at R=0. Convolution might not be correct!'	
@@ -348,11 +351,11 @@ def fitcomm():
 	out = minimize(construct_model.residual, fit_parameters, args=(x,n_all,sersic_entry,exp_entry,gauss_entry,psf_entry,ferrer_entry,corsic_entry,id_entry,td_entry,PSF, fit_min,fit_max,ellipticity), kws={'data':data})
 	freepar = fit_max-fit_min-out.nfree
 	modelf = open('modelf_'+IP.get(),'w')
-	modelf.write ('#SMA'+ ' '+ 'INTENS'+'\n')
+	modelf.write ('#SMA'+ ' '+ 'INTENS'+' '+'INTEND_data'+'\n')
 	sfact = 2.5*log10(pxscale**2)
 	if sampling=='linear':
 		fit = construct_model.residual(fit_parameters, x, n_all, sersic_entry,exp_entry,gauss_entry,psf_entry,ferrer_entry,corsic_entry,id_entry,td_entry,PSF,fit_min,fit_max,ellipticity)
-		for i in range(0,len(x)): modelf.write (str(round(x[i]/pxscale,2))+ '  '+str(10.**((mzp - fit[i] + sfact)/2.5))+ '\n')
+		for i in range(0,len(x)): modelf.write (str(round(x[i]/pxscale,2))+ '  '+str(10.**((mzp - fit[i] + sfact)/2.5))+ '  '+str(10.**((mzp - data_original[i] + sfact)/2.5))+'\n')
 		modelf.close()
 		residu=data-fit
 		resexx=residu[fit_min:fit_max]
@@ -363,7 +366,7 @@ def fitcomm():
 		modelint = interp1d(x,fit,kind='slinear')
 		fit_original = modelint(x_original)
 		for i in range(0,len(x_original)): 
-			modelf.write (str(round(x_original[i]/pxscale,2))+ '  '+str(10.**((mzp - fit_original[i] + sfact)/2.5))+ '\n')
+			modelf.write (str(round(x_original[i]/pxscale,2))+ '  '+str(10.**((mzp - fit_original[i] + sfact)/2.5)) + '  '+str(10.**((mzp - data_original[i] + sfact)/2.5))+ '\n')
 		residu = data_original - fit_original
         resexx=residu[fit_mino:fit_maxo]
         deltarms=sqrt(sum((resexx)**2)/(len(resexx)-freepar+1))
@@ -380,6 +383,7 @@ def fitcomm():
 	if (psf_type != 'numerical'):
 		logf.write ('PSF: ' + str(PSF) + '\n')
 	else: logf.write ('PSF: ' + PNV.get()+'\n')
+	logf.write ('Central ellipticity: '+str(ellipticity)+'\n')
 	logf.write ('Zero-point magnitude: '+str(mzp)+'\n')
 	logf.write ('Pixel scale ["/px]: '+str(pxscale)+'\n')
 	logf.write ('Radial axis: '+str(axistype.get())+'\n')
@@ -408,7 +412,7 @@ def fitcomm():
 	#----------------------------------------------------------	
 	if (fit_min > xmin): ax1.plot(x_original[xmino:fit_mino],data_original[xmino:fit_mino], marker='o', color='white', markersize=7., linestyle='None')
 	if (fit_max < xmax): ax1.plot(x_original[fit_maxo:xmaxo],data_original[fit_maxo:xmaxo], marker='o', color='white', markersize=7., linestyle='None')
-	ax1.plot(x_original[fit_mino:fit_maxo],data_original[fit_mino:fit_maxo], marker='o', color='red', markersize=7., linestyle='None', label='Data')
+	ax1.plot(x_original[fit_mino:fit_maxo],data_original[fit_mino:fit_maxo], marker='o', color='red', markersize=7., linestyle='None', label='Data', markeredgecolor='darkred')
 	plt.text(0.65,0.95, TitlLabEn.get(), fontsize=19, horizontalalignment='center', verticalalignment='top', transform = ax1.transAxes)
 	#----------------------------------------------------------	
 	
@@ -416,7 +420,7 @@ def fitcomm():
 		type = 'sersic'
 		i=0
 		comp=construct_model.component(fit_parameters, xx, ns, i, type, sersic_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-		plt.plot(xx,comp, color=sersic_entry[4].get(), linewidth=1.7)
+		plt.plot(xx,comp, color=sersic_entry[4].get(), linewidth=1.6)
 	
 		if (sersic_entry[0].get()==1):
 			#vals = fit_parameters.valuesdict()
@@ -434,7 +438,7 @@ def fitcomm():
 		type = 'sersic'
 		for i in range(0,ns):
 			comp=construct_model.component(fit_parameters, xx, ns, i, type, sersic_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-			plt.plot(xx,comp, color=sersic_entry[i,4].get(), linewidth=1.7)
+			plt.plot(xx,comp, color=sersic_entry[i,4].get(), linewidth=1.6)
 		
 			if (sersic_entry[i,0].get()==1):
 				#if (sersic_entry[0,0].get()==1):
@@ -453,7 +457,7 @@ def fitcomm():
 		type = 'corsic'
 		i=0
 		comp=construct_model.component(fit_parameters, xx, nc, i, type, corsic_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-		plt.plot(xx,comp, color=corsic_entry[7].get(), linewidth=1.7)
+		plt.plot(xx,comp, color=corsic_entry[7].get(), linewidth=1.6)
 		if (corsic_entry[0].get()==1):
 			magtot=total_magnitude.compute(xx,comp,elle)
 			logf.write ('+ Integrated total magnitude = '+str(magtot)+'\n')
@@ -463,7 +467,7 @@ def fitcomm():
 		type = 'corsic'
 		for i in range(0,ns):
 			comp=construct_model.component(fit_parameters, xx, nc, i, type, corsic_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-			plt.plot(xx,comp, color=corsic_entry[i,7].get(), linewidth=1.7)
+			plt.plot(xx,comp, color=corsic_entry[i,7].get(), linewidth=1.6)
 			if (corsic_entry[i,0].get()==1):
 				magtot=total_magnitude.compute(xx,comp,elle)
 				logf.write ('+ Integrated total magnitude mag = '+str(magtot)+'\n')
@@ -473,7 +477,7 @@ def fitcomm():
 		type = 'exponential'
 		i=0
 		comp=construct_model.component(fit_parameters, xx, ne, i, type, exp_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-		plt.plot(xx,comp, color=exp_entry[3].get(), linewidth=1.7)
+		plt.plot(xx,comp, color=exp_entry[3].get(), linewidth=1.6)
 		vals = fit_parameters.valuesdict()
 		
 		if (exp_entry[0].get()==1):
@@ -485,7 +489,7 @@ def fitcomm():
 		type = 'exponential'
 		for i in range(0,ne):
 			comp=construct_model.component(fit_parameters, xx, ne, i, type, exp_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-			plt.plot(xx,comp, color=exp_entry[i,3].get(), linewidth=3)
+			plt.plot(xx,comp, color=exp_entry[i,3].get(), linewidth=1.6)
 			if (exp_entry[i,0].get()==1):
 				magtot=integrator.magnitude(xx,comp,mzp)
 				logf.write ('+ Integrated total magnitude = '+str(magtot)+'\n')
@@ -495,7 +499,7 @@ def fitcomm():
 		type = 'id'
 		i=0
 		comp=construct_model.component(fit_parameters, xx, nid, i, type, id_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-		plt.plot(xx,comp, color=id_entry[3].get(), linewidth=1.7)
+		plt.plot(xx,comp, color=id_entry[3].get(), linewidth=1.6)
 		vals = fit_parameters.valuesdict()
 		
 
@@ -503,13 +507,13 @@ def fitcomm():
 		type = 'id'
 		for i in range(0,nid):
 			comp=construct_model.component(fit_parameters, xx, nid, i, type, id_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-			plt.plot(xx,comp, color=id_entry[i,3].get(), linewidth=3)
+			plt.plot(xx,comp, color=id_entry[i,3].get(), linewidth=1.6)
 			
 	if (ng == 1):
 		type = 'gaussian'
 		i=0
 		comp=construct_model.component(fit_parameters, xx, ng, i, type, gauss_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-		plt.plot(xx,comp, color=gauss_entry[4].get(), linewidth=1.7)
+		plt.plot(xx,comp, color=gauss_entry[4].get(), linewidth=1.6)
 		if (gauss_entry[0].get()==1):
 		       	magtot=total_magnitude.compute(xx,comp,elle)
 		       	logf.write ('+ Integrated total magnitude = '+str(magtot)+'\n')
@@ -519,7 +523,7 @@ def fitcomm():
 		type = 'gaussian'
 		for i in range(0,ng):
 			comp=construct_model.component(fit_parameters, xx, ng, i, type, gauss_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-			plt.plot(xx,comp, color=gauss_entry[i,4].get(), linewidth=1.7)
+			plt.plot(xx,comp, color=gauss_entry[i,4].get(), linewidth=1.6)
 			if (gauss_entry[i,0].get()==1):
 				magtot=total_magnitude.compute(xx,comp,elle)
 				logf.write ('+ Integrated total magnitude = '+str(magtot)+'\n')
@@ -529,7 +533,7 @@ def fitcomm():
 		type = 'psf'
 		i=0
 		comp=construct_model.component(fit_parameters, xx, np, i, type, psf_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-		plt.plot(xx,comp, color=psf_entry[2].get(), linewidth=1.7)
+		plt.plot(xx,comp, color=psf_entry[2].get(), linewidth=1.6)
 		if (psf_entry[0].get()==1):
 		       	magtot=total_magnitude.compute(xx,comp,elle)
 		       	logf.write ('+ Integrated total magnitude = '+str(magtot)+'\n')
@@ -539,7 +543,7 @@ def fitcomm():
 		type = 'psf'
 		for i in range(0,np):
 			comp=construct_model.component(fit_parameters, xx, np, i, type, psf_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-			plt.plot(xx,comp, color=psf_entry[i,2].get(), linewidth=1.7)
+			plt.plot(xx,comp, color=psf_entry[i,2].get(), linewidth=1.6)
 			if (psf_entry[i,0].get()==1):
 				magtot=total_magnitude.compute(xx,comp,elle)
 				logf.write ('+ Integrated total magnitude = '+str(magtot)+'\n')
@@ -549,7 +553,7 @@ def fitcomm():
 		type = 'ferrer'
 		i=0
 		comp=construct_model.component(fit_parameters, xx, nf, i, type, ferrer_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-		plt.plot(xx,comp, color=ferrer_entry[5].get(), linewidth=1.7)
+		plt.plot(xx,comp, color=ferrer_entry[5].get(), linewidth=1.6)
 		if (ferrer_entry[0].get()==1):
 		       	magtot=total_magnitude.compute(xx,comp,elle)
 		       	logf.write ('+ Integrated total magnitude = '+str(magtot)+'\n')
@@ -559,7 +563,7 @@ def fitcomm():
 		type = 'ferrer'
 		for i in range(0,nf):
 			comp=construct_model.component(fit_parameters, xx, nf, i, type, ferrer_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-			plt.plot(xx,comp, color=ferrer_entry[i,5].get(), linewidth=1.7)
+			plt.plot(xx,comp, color=ferrer_entry[i,5].get(), linewidth=1.6)
 			if (ferrer_entry[i,0].get()==1):
 				magtot=total_magnitude.compute(xx,comp,elle)
 				logf.write ('+ Integrated total magnitude = '+str(magtot)+'\n')
@@ -569,7 +573,7 @@ def fitcomm():
 		type = 'td'
 		i=0
 		comp=construct_model.component(fit_parameters, xx, ntd, i, type, td_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-		plt.plot(xx,comp, color=td_entry[5].get(), linewidth=1.7)
+		plt.plot(xx,comp, color=td_entry[5].get(), linewidth=1.6)
 		if (td_entry[0].get()==1):
 		       	magtot=total_magnitude.compute(xx,comp,elle)
 		       	logf.write ('+ Integrated total magnitude = '+str(magtot)+'\n')
@@ -579,7 +583,7 @@ def fitcomm():
 		type = 'td'
 		for i in range(0,ntd):
 			comp=construct_model.component(fit_parameters, xx, ntd, i, type, td_entry, PSF_ext, PSF_fft_ext, PSF_w, logf, elle,ellipticity)
-			plt.plot(xx,comp, color=td_entry[i,5].get(), linewidth=1.7)
+			plt.plot(xx,comp, color=td_entry[i,5].get(), linewidth=1.6)
 			if (td_entry[i,0].get()==1):
 				magtot=total_magnitude.compute(xx,comp,elle)
 				logf.write ('+ Integrated total magnitude = '+str(magtot)+'\n')
@@ -594,7 +598,7 @@ def fitcomm():
 	logf.write ('\n')
 	logf.close()
 	
-	ax1.plot(xx,fit_nice, color='black', label='Model', linewidth=2.5)
+	ax1.plot(xx,fit_nice, color='black', label='Model', linewidth=1.6)
 	plt.gca().invert_yaxis()
 	plt.ylabel('$\mu$ [mag arcsec$^{-2}$]', fontsize=20, labelpad=28)
 	plt.tick_params(axis='x', labelbottom='off')
