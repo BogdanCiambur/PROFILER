@@ -1,6 +1,6 @@
 # PROFILER 1D Decomposition [v2.0]
 
-This repository contains the code Profiler, a Python program for decomposing galaxy light profiles in 1D
+This repository contains the code PROFILER, a Python program for decomposing galaxy light profiles in 1D
 
 #COMPATIBILITY:
 
@@ -16,7 +16,7 @@ Tested on Mac OSX Yosemite and Linux Ubuntu 14.04, 16.04 LTE
 
 #RECOMMENDED INSTALLATION
 
-1. Extract the profiler2.0 directory from the .tar archive in a desired location
+1. Extract the "profiler2.0" directory from the .tar archive in a desired location
 2. Edit the .bashrc (or .cshrc) file to contain the line:
   alias profiler='python path/to/profiler2.0/profiler.py' (if using bash terminal)
   alias profiler python path/to/profiler2.0/profiler.py   (if using cshell)
