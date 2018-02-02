@@ -8,7 +8,7 @@ Tested on Mac OSX Yosemite and Linux Ubuntu 14.04, 16.04 LTE
 
 #REQUIREMENTS:
 
-1. Pre-installed Python distribution (Ureka - which contains PyRAF - is good: http://ssb.stsci.edu/ureka/)
+1. Pre-installed Python distribution (Ureka - which contains PyRAF - is good: http://ssb.stsci.edu/ureka/). Python 2.7 recommended, Python 3 not tested but may have incompatibilities.
 
 2. The Python library lmfit version 0.8.3 (https://pypi.python.org/pypi/lmfit OR if pip is available, then in the terminal $> pip install lmfit==0.8.3)
 
