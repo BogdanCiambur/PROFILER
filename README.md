@@ -10,7 +10,7 @@ Tested on Mac OSX Yosemite and Linux Ubuntu 14.04, 16.04 LTE
 
 1. Pre-installed Python distribution (Ureka - which contains PyRAF - is good: http://ssb.stsci.edu/ureka/). Python 2.7 recommended, Python 3 not tested but may have incompatibilities.
 
-2. The Python library lmfit version 0.8.3 (https://pypi.python.org/pypi/lmfit OR if pip is available, then in the terminal $> pip install lmfit==0.8.3)
+2. The Python library lmfit [el-em-fit] version 0.8.3 (https://pypi.python.org/pypi/lmfit OR if pip is available, then in the terminal $> pip install lmfit==0.8.3)
 
 3. A LaTeX distribution, necessary for generating the figures (the special fonts are required). Note, the code fits and generates logfile with results without this, but does not make the plots.
 
